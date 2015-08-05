@@ -1,0 +1,19 @@
+{
+  "name": "data-lab-blocks",
+  "version": "0.0.0",
+  "description": "",
+  "dependencies": {
+    "grunt": "^0.4.5",
+    "grunt-angular-templates": "^0.5.7",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-literate": "^0.2.0",
+    "load-grunt-config": "^0.17.1"
+  },
+  "author": "",
+  "license": "private",
+  "devDependencies": {
+    "marked": "^0.3.5",
+    "optimist": "^0.6.1"
+  }
+}

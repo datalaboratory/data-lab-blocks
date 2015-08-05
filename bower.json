@@ -1,0 +1,15 @@
+{
+  "name": "data-lab-blocks",
+  "version": "0.0.0",
+  "authors": [
+    "Dima Devgru <git@devg.ru>"
+  ],
+  "license": "private",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
