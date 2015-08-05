@@ -1,1 +1,1 @@
-angular.module('dataLab', []);
+var dataLab = angular.module('dataLab', []);

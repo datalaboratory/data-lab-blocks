@@ -1,4 +1,4 @@
-angular.module('dataLab').directive('labMargin', function () {
+dataLab.directive('labMargin', function () {
     return {
         // Обычно подключается к `<g>`.
         restrict: 'A',

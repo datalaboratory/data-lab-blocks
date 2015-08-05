@@ -1,4 +1,4 @@
-angular.module('dataLab').directive('labSizeToScales', function () {
+dataLab.directive('labSizeToScales', function () {
     return {
         // Обычно подключается к `<svg>`.
         restrict: 'A',
