@@ -1,3 +1,4 @@
+// Задаёт `range` переданным шкалам на основе размеров элемента с учётом отступов.
 dataLab.directive('labSizeToScales', function () {
     return {
         // Обычно подключается к `<svg>`.
@@ -10,7 +11,7 @@ dataLab.directive('labSizeToScales', function () {
             var element = $element[0];
 
             // Срабатывает на `render`.
-            $scope.$on('render', function ($event, render) {
+            $scope.$on('render', function onRender($event, render) {
                 // В `range` шкал попадают размеры «рабочей области» элемента —
                 // реальные размеры минус отступы, описанные в `margin`.
                 var width = element.clientWidth
