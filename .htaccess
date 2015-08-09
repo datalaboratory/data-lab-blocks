@@ -1,4 +1,4 @@
 AuthType Basic
-AuthName "Логин и пароль тут: https://basecamp.com/2264148/projects/4556331/todos/185978607"
+AuthName "Login and password are in Basecamp"
 AuthUserFile /var/www/domains/datalaboratoryru/blocks/.htpasswd
 Require valid-user
