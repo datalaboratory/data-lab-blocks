@@ -3,8 +3,6 @@ dataLab.directive('labRenderLoop', function ($rootScope, $timeout) {
     return {
         // Подключается к любому элементу.
         restrict: 'A',
-        // Не использует `$scope`.
-        scope: {},
         link: function () {
             var renderRequired = false;
             $rootScope.$on('renderRequired', function onRenderRequired() {

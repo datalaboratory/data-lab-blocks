@@ -3,8 +3,6 @@ dataLab.directive('labMargin', function () {
     return {
         // Обычно подключается к `<g>`.
         restrict: 'A',
-        // Не использует `$scope`.
-        scope: {},
         link: function ($scope, $element) {
             var element = $element[0];
             var d3element = d3.select(element);

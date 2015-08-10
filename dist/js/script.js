@@ -119,8 +119,6 @@ dataLab.directive('labMargin', function () {
     return {
         // Обычно подключается к `<g>`.
         restrict: 'A',
-        // Не использует `$scope`.
-        scope: {},
         link: function ($scope, $element) {
             var element = $element[0];
             var d3element = d3.select(element);
@@ -141,8 +139,6 @@ dataLab.directive('labRenderLoop', function ($rootScope, $timeout) {
     return {
         // Подключается к любому элементу.
         restrict: 'A',
-        // Не использует `$scope`.
-        scope: {},
         link: function () {
             var renderRequired = false;
             $rootScope.$on('renderRequired', function onRenderRequired() {
@@ -237,6 +233,8 @@ dataLab.filter('trust', function ($sce) {
     }
 });
 
+// Файл-заглушка.
+// Используйте навигацию в правом-верхнем углу экрана.
 dataLab.constant('multifilter', function (items, filters) {
     if (!items || !filters) return;
     var keys = Object.keys(filters);
