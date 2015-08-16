@@ -1,4 +1,4 @@
-dataLab.constant('multifilter', function (items, filters) {
+dataLab.value('multifilter', function (items, filters) {
     if (!items || !filters) return;
     var keys = Object.keys(filters);
     return items.filter(function (item) {

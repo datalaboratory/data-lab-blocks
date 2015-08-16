@@ -235,7 +235,7 @@ dataLab.filter('trust', function ($sce) {
 
 // Файл-заглушка.
 // Используйте навигацию в правом-верхнем углу экрана.
-dataLab.constant('multifilter', function (items, filters) {
+dataLab.value('multifilter', function (items, filters) {
     if (!items || !filters) return;
     var keys = Object.keys(filters);
     return items.filter(function (item) {
@@ -246,7 +246,7 @@ dataLab.constant('multifilter', function (items, filters) {
         });
     });
 });
-dataLab.constant('numberDeclension', function (number, titles) {
+dataLab.value('numberDeclension', function (number, titles) {
     if (!angular.isDefined(number) || !titles) return 'no declension';
     if (angular.isString(titles)) titles = titles.split(',');
     if (titles.length == 3) {
@@ -262,7 +262,7 @@ dataLab.constant('numberDeclension', function (number, titles) {
     return 'no declension';
 });
 
-dataLab.constant('removePrototype', function (object) {
+dataLab.value('removePrototype', function (object) {
     var result = {};
     for (var key in object) {
         result[key] = object[key];
@@ -271,7 +271,7 @@ dataLab.constant('removePrototype', function (object) {
 });
 // Округление чисел до заданной точности.
 // Функция `roundTo` принимает число в качестве аргумента, значения точности и возвращает округляющую функцию.
-dataLab.constant('roundTo', function (precision) {
+dataLab.value('roundTo', function roundTo(precision) {
     var log2 = Math.log2(precision);
     // Если точность меньше единицы и не является степенью двойки…
     if (log2 < 0 && Math.floor(log2) != Math.ceil(log2)) {
@@ -288,7 +288,7 @@ dataLab.constant('roundTo', function (precision) {
         return precision * Math.round(value / precision);
     }
 });
-dataLab.constant('toGrayscale', function (color) {
+dataLab.value('toGrayscale', function (color) {
     var hcl = d3.hcl(color);
     hcl.c = 0;
     return hcl.toString()

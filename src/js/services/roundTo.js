@@ -1,6 +1,6 @@
 // Округление чисел до заданной точности.
 // Функция `roundTo` принимает число в качестве аргумента, значения точности и возвращает округляющую функцию.
-dataLab.constant('roundTo', function (precision) {
+dataLab.value('roundTo', function roundTo(precision) {
     var log2 = Math.log2(precision);
     // Если точность меньше единицы и не является степенью двойки…
     if (log2 < 0 && Math.floor(log2) != Math.ceil(log2)) {

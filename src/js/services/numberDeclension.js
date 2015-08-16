@@ -1,4 +1,4 @@
-dataLab.constant('numberDeclension', function (number, titles) {
+dataLab.value('numberDeclension', function (number, titles) {
     if (!angular.isDefined(number) || !titles) return 'no declension';
     if (angular.isString(titles)) titles = titles.split(',');
     if (titles.length == 3) {
