@@ -6,9 +6,12 @@ dataLab.directive('backedText', function(removePrototype) {
         replace: true,
         templateUrl: 'backedText/backedText.html',
         scope: {
-            'paddingX': '=',
-            'paddingY': '=',
-            'padding': '='
+            paddingX: '=',
+            paddingY: '=',
+            padding: '=',
+            radiusX: '=',
+            radiusY: '=',
+            radius: '='
         },
         transclude: true,
         link: function($scope, $element) {
@@ -19,12 +22,15 @@ dataLab.directive('backedText', function(removePrototype) {
                 return removePrototype(text.getBBox());
             };
             $scope.$watch(bbox, function(box) {
-                var paddingX, paddingY;
-                paddingX = $scope.paddingX || $scope.padding || 0;
-                paddingY = $scope.paddingY || $scope.padding || 0;
+                var paddingX = $scope.paddingX || $scope.padding || 0;
+                var paddingY = $scope.paddingY || $scope.padding || 0;
+                var radiusX = $scope.radiusX || $scope.radius || 0;
+                var radiusY = $scope.radiusY || $scope.radius || 0;
                 $rect.attr({
                     x: box.x - paddingX,
                     y: box.y - paddingY,
+                    rx: radiusX,
+                    ry: radiusY,
                     width: box.width + paddingX * 2,
                     height: box.height + paddingY * 2
                 });
@@ -203,6 +209,7 @@ dataLab.directive('labSizeToScales', function () {
         }
     }
 });
+// Заменяет `NaN` на `undefined`.
 dataLab.filter('preventNaN', function () {
     return function (number) {
         if (isNaN(number)) return undefined;
@@ -210,7 +217,9 @@ dataLab.filter('preventNaN', function () {
     }
 });
 
+// Этот код «превращает» сервисы в фильтры, чтобы их можно было использовать в шаблонах.
 var servicesAsFilters = [
+// Включён для этих сервисов:
     'numberDeclension'
 ];
 servicesAsFilters.forEach(function (filter) {
@@ -219,8 +228,10 @@ servicesAsFilters.forEach(function (filter) {
     });
 });
 
+// Фильтр для прохода ангуляровской [проверки](https://docs.angularjs.org/api/ng/service/$sce) небезопасного контента.
 dataLab.filter('trust', function ($sce) {
     return function (html) {
+        // Есть эксперементальная поддержка промисов.
         if (angular.isObject(html)) {
             if (html.$$state.value) {
                 console.log('trusting promise', html.$$state.value);
@@ -235,6 +246,7 @@ dataLab.filter('trust', function ($sce) {
 
 // Файл-заглушка.
 // Используйте навигацию в правом-верхнем углу экрана.
+// Стандартный фильтр, удобен для проверки массива объектов на соответствие набору свойств.
 dataLab.value('multifilter', function (items, filters) {
     if (!items || !filters) return;
     var keys = Object.keys(filters);
@@ -246,23 +258,43 @@ dataLab.value('multifilter', function (items, filters) {
         });
     });
 });
+// Сервис для склонения чисел.
+// Принимает два аргумента — число и набор склонений.
 dataLab.value('numberDeclension', function (number, titles) {
     if (!angular.isDefined(number) || !titles) return 'no declension';
+    // Набор склонений может быть строкой, разделённой запятыми или массивом.
     if (angular.isString(titles)) titles = titles.split(',');
+    // Для русскоязычного склонения нужно три формы.
+    // Рассмотрим на примере `["бегун", "бегуна", "бегунов"]`.
     if (titles.length == 3) {
+        // 0 бегунов, 1 бегун, 2-3-4 бегуна, 5 бегунов.
         var cases = [2, 0, 1, 1, 1, 2];
-        var n1 = (number % 100 > 4 && number % 100 < 20);
-        var n2 = cases[(number % 10 < 5) ? number % 10 : 5];
-        var title = (n1 ? 2 : n2);
+        // Берём остаток от деления на сотню.
+        number %= 100;
+        // По умолчанию предполагаем третью форму, встречается чаще всего, если остаток меньше 5 или больше 19.
+        var title = 2;
+        // В остальных случаях подбираем форму.
+        if (number < 5 || number > 19) {
+            // Берём остаток от деления на десять.
+            number %= 10;
+            // 6-7-8-9 считаем как 5
+            if (number > 5) number = 5;
+            // и берём нужный вариант из `cases`.
+            title = cases[number];
+        }
         return titles[title];
     }
+    // Для англоязычного формы две, единственная и множественная.
     if (titles.length == 2) {
-        return number == 1 ? titles[0] : titles[1]
+        return titles[number == 1 ? 0 : 1];
     }
+    // Остальные случаи обработать не пытаемся.
     return 'no declension';
 });
 
-dataLab.value('removePrototype', function (object) {
+// Сервис, превращающий специфичный объект (например, результат `getBBox()`) в обычный.
+// Возвращает объект без прототипа, со всеми свойствами переданного объекта.
+dataLab.value('removePrototype', function removePrototype(object) {
     var result = {};
     for (var key in object) {
         result[key] = object[key];
@@ -288,6 +320,7 @@ dataLab.value('roundTo', function roundTo(precision) {
         return precision * Math.round(value / precision);
     }
 });
+// Приведение `d3`-совместимого цвета к соответствующему серому оттенку.
 dataLab.value('toGrayscale', function (color) {
     var hcl = d3.hcl(color);
     hcl.c = 0;

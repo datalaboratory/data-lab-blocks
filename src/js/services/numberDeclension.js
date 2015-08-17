@@ -1,15 +1,33 @@
+// Сервис для склонения чисел.
+// Принимает два аргумента — число и набор склонений.
 dataLab.value('numberDeclension', function (number, titles) {
     if (!angular.isDefined(number) || !titles) return 'no declension';
+    // Набор склонений может быть строкой, разделённой запятыми или массивом.
     if (angular.isString(titles)) titles = titles.split(',');
+    // Для русскоязычного склонения нужно три формы.
+    // Рассмотрим на примере `["бегун", "бегуна", "бегунов"]`.
     if (titles.length == 3) {
+        // 0 бегунов, 1 бегун, 2-3-4 бегуна, 5 бегунов.
         var cases = [2, 0, 1, 1, 1, 2];
-        var n1 = (number % 100 > 4 && number % 100 < 20);
-        var n2 = cases[(number % 10 < 5) ? number % 10 : 5];
-        var title = (n1 ? 2 : n2);
+        // Берём остаток от деления на сотню.
+        number %= 100;
+        // По умолчанию предполагаем третью форму, встречается чаще всего, если остаток меньше 5 или больше 19.
+        var title = 2;
+        // В остальных случаях подбираем форму.
+        if (number < 5 || number > 19) {
+            // Берём остаток от деления на десять.
+            number %= 10;
+            // 6-7-8-9 считаем как 5
+            if (number > 5) number = 5;
+            // и берём нужный вариант из `cases`.
+            title = cases[number];
+        }
         return titles[title];
     }
+    // Для англоязычного формы две, единственная и множественная.
     if (titles.length == 2) {
-        return number == 1 ? titles[0] : titles[1]
+        return titles[number == 1 ? 0 : 1];
     }
+    // Остальные случаи обработать не пытаемся.
     return 'no declension';
 });
