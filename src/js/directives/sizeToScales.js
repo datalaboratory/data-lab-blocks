@@ -8,27 +8,26 @@ dataLab.directive('labSizeToScales', function () {
             scales: '=labSizeToScales'
         },
         link: function ($scope, $element) {
-            var element = $element[0];
-
             // Срабатывает на `render`.
             $scope.$on('render', function onRender($event, render) {
                 // В `range` шкал попадают размеры «рабочей области» элемента —
                 // реальные размеры минус отступы, описанные в `margin`.
-                var width = element.clientWidth
+                var width = $element.width()
                     - render.margin.left - render.margin.right;
-                var height = element.clientHeight
+                var height = $element.height()
                     - render.margin.top - render.margin.bottom;
 
                 var setWidth = function (scale) {
                     // У горизонтальных шкал начало отсчёта слева.
                     scale.range([0, width]);
                 };
+
                 var setHeight = function (scale) {
                     // У вертикальных — снизу.
                     scale.range([height, 0]);
                 };
 
-                // Это ОК, если ключа `x` или `y` нет в объекте.
+                // Это ОК, если ключа `x` или `y` нет в объекте — работаем с тем, что есть.
                 if ($scope.scales.x) {
                     // Если по ключу нашёлся массив шкал — проставим значения в каждую из них.
                     if (angular.isArray($scope.scales.x))
