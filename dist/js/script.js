@@ -272,6 +272,20 @@ dataLab.filter('trust', function ($sce) {
 // * [services](/docs/services.html) — «превращает» сервисы в фильтры.
 
 // Также используйте навигацию в правом-верхнем углу экрана.
+dataLab.factory('applyTransition', function (callMethods) {
+    return function applyTransition(d3element, transition) {
+        if (!transition) return d3element;
+
+        d3element = d3element.transition();
+        callMethods(transition, d3element);
+        return d3element;
+    };
+});
+dataLab.value('callMethods', function callMethods(config, target) {
+    Object.keys(config).forEach(function (key) {
+        if (target[key]) target[key](config[key]);
+    });
+});
 // Стандартный фильтр, удобен для проверки массива объектов на соответствие набору свойств.
 dataLab.value('multifilter', function (items, filters) {
     if (!items || !filters) return;
