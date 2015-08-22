@@ -175,6 +175,29 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
         }
     };
 });
+// Директива задаёт прямоугольнику размеры рабочей области.
+dataLab.directive('labFillSvg', function () {
+    return {
+        restrict: 'A',
+        scope: {},
+        link: function ($scope, $element) {
+            var element = $element[0];
+            var d3element = d3.select(element);
+
+            var $svg = $element.parents('svg');
+
+            // Срабатывает на `render`.
+            $scope.$on('render', function ($event, render) {
+                var width = $svg.width() - render.margin.left - render.margin.right;
+                var height = $svg.height() - render.margin.top - render.margin.bottom;
+
+                d3element
+                    .attr('width', width)
+                    .attr('height', height);
+            })
+        }
+    }
+});
 // Сдвигает целевой `SVG`-элемент на отступ, указанный в параметрах `render`.
 dataLab.directive('labMargin', function () {
     return {
@@ -191,6 +214,25 @@ dataLab.directive('labMargin', function () {
                 var translate = 'translate('
                     + render.margin.left + ',' + render.margin.top + ')';
                 d3element.attr('transform', translate)
+            })
+        }
+    }
+});
+// Вызов произвольной функции, обрабатывающей событие `render`.
+// Элемент, на котором используется директива передаётся через `this`.
+angular.module('dataLab').directive('labRender', function () {
+    return {
+        restrict: 'A',
+        scope: {
+            cb: '=labRender'
+        },
+        link: function ($scope, $element) {
+            // Срабатывает на `render`.
+            $scope.$on('render', function ($event, render) {
+                // Коллбек должен быть функцией.
+                if (angular.isFunction($scope.cb))
+                // Коллбек вызывается с аргументами `$event` и `render` — событием с мета-информацией и `render`.
+                    $scope.cb.call($element[0], $event, render)
             })
         }
     }
@@ -274,6 +316,7 @@ dataLab.filter('preventNaN', function () {
 // Этот код «превращает» сервисы в фильтры, чтобы их можно было использовать в шаблонах.
 var servicesAsFilters = [
 // Включён для этих сервисов:
+    'last',
     'numberDeclension'
 ];
 servicesAsFilters.forEach(function (filter) {
@@ -340,6 +383,10 @@ dataLab.value('callMethods', function callMethods(config, target) {
     Object.keys(config).forEach(function (key) {
         if (target[key]) target[key](config[key]);
     });
+});
+// Возвращает последний элемент массива.
+dataLab.value('last', function last(array) {
+    return array[array.length - 1];
 });
 // Стандартный фильтр, удобен для проверки массива объектов на соответствие набору свойств.
 dataLab.value('multifilter', function (items, filters) {
