@@ -14,7 +14,7 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
 
             var prevGrid = false;
 
-            $scope.$on('render', function ($event, render) {
+            $scope.$on('render', function ($event, render, transition) {
                 if (!$scope.config) return;
                 var config = $scope.config;
                 if (!config.scale) return;
@@ -36,7 +36,7 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
 
                 var target;
                 if (prevGrid == config.grid)
-                    target = applyTransition(d3element, render.transition);
+                    target = applyTransition(d3element, transition);
                 else
                     target = d3element;
                 prevGrid = config.grid;
