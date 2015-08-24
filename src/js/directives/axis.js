@@ -1,5 +1,7 @@
+// Рисует ось и линии сетки.
 dataLab.directive('labAxis', function (callMethods, applyTransition) {
     return {
+        // Подключается к `<g>`.
         restrict: 'A',
         scope: {
             config: '=labAxis'
@@ -20,11 +22,8 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
                 if (!config.scale) return;
                 if (!config.orient) return;
 
-                callMethods(config, axis);
+                callMethods(axis, config);
 
-                Object.keys(config).forEach(function (key) {
-                    if (axis[key]) axis[key](config[key]);
-                });
                 var width = $svg.width() - render.margin.left - render.margin.right;
                 var height = $svg.height() - render.margin.top - render.margin.bottom;
 
@@ -35,6 +34,7 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
                     axis.tickSize(0, 0);
 
                 var target;
+                // При включении сетки она отрисуется без анимации.
                 if (prevGrid == config.grid)
                     target = applyTransition(d3element, transition);
                 else

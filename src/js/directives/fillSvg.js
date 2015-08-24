@@ -1,6 +1,7 @@
 // Директива задаёт прямоугольнику размеры рабочей области.
 dataLab.directive('labFillSvg', function () {
     return {
+        // Подключается к `<rect>`.
         restrict: 'A',
         scope: {},
         link: function ($scope, $element) {

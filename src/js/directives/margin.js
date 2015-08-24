@@ -1,7 +1,7 @@
 // Сдвигает целевой `SVG`-элемент на отступ, указанный в параметрах `render`.
 dataLab.directive('labMargin', function () {
     return {
-        // Обычно подключается к `<g>`.
+        // Подключается к `<g>`.
         restrict: 'A',
         link: function ($scope, $element) {
             var element = $element[0];

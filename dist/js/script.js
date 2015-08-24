@@ -120,8 +120,10 @@ dataLab.directive('labDropdownFilter', function ($parse) {
         }
     };
 });
+// Рисует ось и линии сетки.
 dataLab.directive('labAxis', function (callMethods, applyTransition) {
     return {
+        // Подключается к `<g>`.
         restrict: 'A',
         scope: {
             config: '=labAxis'
@@ -142,11 +144,8 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
                 if (!config.scale) return;
                 if (!config.orient) return;
 
-                callMethods(config, axis);
+                callMethods(axis, config);
 
-                Object.keys(config).forEach(function (key) {
-                    if (axis[key]) axis[key](config[key]);
-                });
                 var width = $svg.width() - render.margin.left - render.margin.right;
                 var height = $svg.height() - render.margin.top - render.margin.bottom;
 
@@ -157,6 +156,7 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
                     axis.tickSize(0, 0);
 
                 var target;
+                // При включении сетки она отрисуется без анимации.
                 if (prevGrid == config.grid)
                     target = applyTransition(d3element, transition);
                 else
@@ -178,6 +178,7 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
 // Директива задаёт прямоугольнику размеры рабочей области.
 dataLab.directive('labFillSvg', function () {
     return {
+        // Подключается к `<rect>`.
         restrict: 'A',
         scope: {},
         link: function ($scope, $element) {
@@ -201,7 +202,7 @@ dataLab.directive('labFillSvg', function () {
 // Сдвигает целевой `SVG`-элемент на отступ, указанный в параметрах `render`.
 dataLab.directive('labMargin', function () {
     return {
-        // Обычно подключается к `<g>`.
+        // Подключается к `<g>`.
         restrict: 'A',
         link: function ($scope, $element) {
             var element = $element[0];
@@ -219,9 +220,9 @@ dataLab.directive('labMargin', function () {
     }
 });
 // Вызов произвольной функции, обрабатывающей событие `render`.
-// Элемент, на котором используется директива передаётся через `this`.
 angular.module('dataLab').directive('labRender', function () {
     return {
+        // Подключается к элементу, который требуется отрисовать.
         restrict: 'A',
         scope: {
             cb: '=labRender'
@@ -232,6 +233,7 @@ angular.module('dataLab').directive('labRender', function () {
                 // Коллбек должен быть функцией.
                 if (angular.isFunction($scope.cb))
                 // Коллбек вызывается с аргументами `$event` и `render` — событием с мета-информацией и `render`.
+                // Элемент, на котором используется директива передаётся через `this`.
                     $scope.cb.call($element[0], $event, render)
             })
         }
@@ -259,7 +261,7 @@ dataLab.directive('labRenderLoop', function ($rootScope, $timeout) {
 // Задаёт `range` переданным шкалам на основе размеров элемента с учётом отступов.
 dataLab.directive('labSizeToScales', function () {
     return {
-        // Обычно подключается к `<svg>`.
+        // Подключается к `<svg>`.
         restrict: 'A',
         scope: {
             // Обязательный параметр — объект со шкалами.
@@ -351,12 +353,18 @@ dataLab.filter('trust', function ($sce) {
 
 // # Директивы
 // «Строительные блоки» `angular`-страниц.
-// * [renderLoop](/docs/renderLoop.html) — обеспечивает рассылку `render`-сообщений;
+// * [axis](/docs/axis.html) — рисует ось и линии сетки;
+// * [fillSvg](/docs/fillSvg.html) — задаёт прямоугольнику размер рабочей области;
 // * [margin](/docs/margin.html) — сдвигает целевой `SVG`-элемент на отступ, указанный в параметрах `render`;
+// * [render](/docs/render.html) — вызывает переданную функцию при получении события `render`;
+// * [renderLoop](/docs/renderLoop.html) — обеспечивает рассылку `render`-сообщений;
 // * [sizeToScales](/docs/sizeToScales.html) — задаёт `range` переданным шкалам на основе размеров элемента с учётом отступов.
 
 // # Сервисы
 // Полезные функции.
+// * [applyTransition](/docs/applyTransition.html) — применяет `transition` к `d3`-выборке, возвращая новую выборку;
+// * [callMethods](/docs/callMethods.html) — вызывает функции объекта, настраивая его;
+// * [last](/docs/last.html) — возвращает последний элемент массива;
 // * [multifilter](/docs/multifilter.html) — стандартный фильтр, удобен для проверки массива объектов на соответствие набору свойств;
 // * [numberDeclension](/docs/numberDeclension.html) — склоняет числа;
 // * [removePrototype](/docs/removePrototype.html) — превращает специфичный объект (например, результат `getBBox()`) в обычный;
@@ -370,16 +378,19 @@ dataLab.filter('trust', function ($sce) {
 // * [services](/docs/services.html) — «превращает» сервисы в фильтры.
 
 // Также используйте навигацию в правом-верхнем углу экрана.
+// Применяет описанный `transition` к `d3`-выборке, возвращая новую выборку.
 dataLab.factory('applyTransition', function (callMethods) {
     return function applyTransition(d3element, transition) {
         if (!transition) return d3element;
 
         d3element = d3element.transition();
-        callMethods(transition, d3element);
+        callMethods(d3element, transition);
         return d3element;
     };
 });
-dataLab.value('callMethods', function callMethods(config, target) {
+// Вызывает на переданном объекте `target` функции, которые указаны в ключах объекта `config`.
+// Аргумент функции — значение соответствующего поля в конфигурации.
+dataLab.value('callMethods', function callMethods(target, config) {
     Object.keys(config).forEach(function (key) {
         if (target[key]) target[key](config[key]);
     });
