@@ -44,12 +44,18 @@ module.exports = (grunt) ->
           module: 'dataLab'
 
     docco:
-      default:
+      readme:
+        src: ['README.js.md']
+        options:
+          output: 'readme/'
+          layout: 'linear'
+      code:
         src: ['src/**/*.js']
         options:
           output: 'docs/'
 
-  grunt.registerTask 'default', ['js', 'css', 'docco']
+  grunt.registerTask 'default', ['js', 'css', 'docs']
+  grunt.registerTask 'docs', ['docco:code', 'docco:readme']
   grunt.registerTask 'templates', ['ngtemplates:dataLab']
   grunt.registerTask 'js', ['templates', 'concat:js']
   grunt.registerTask 'css', ['concat:css']

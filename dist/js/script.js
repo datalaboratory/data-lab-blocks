@@ -317,7 +317,7 @@ dataLab.filter('preventNaN', function () {
 
 // Этот код «превращает» сервисы в фильтры, чтобы их можно было использовать в шаблонах.
 var servicesAsFilters = [
-// Включён для этих сервисов:
+    // Включён для этих сервисов:
     'last',
     'numberDeclension'
 ];
@@ -445,7 +445,7 @@ dataLab.value('numberDeclension', function (number, titles) {
     return 'no declension';
 });
 
-// Сервис, превращающий специфичный объект (например, результат `getBBox()`) в обычный.
+// Сервис, превращающий специфичный объект (например, результат `getBBox()`) в обычный
 // Возвращает объект без прототипа, со всеми свойствами переданного объекта.
 dataLab.value('removePrototype', function removePrototype(object) {
     var result = {};
