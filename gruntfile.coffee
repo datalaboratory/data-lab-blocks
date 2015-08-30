@@ -45,14 +45,14 @@ module.exports = (grunt) ->
 
     docco:
       readme:
-        src: ['README.js.md']
+        src: ['index.js']
         options:
-          output: 'readme/'
+          output: 'docs/'
           layout: 'linear'
       code:
         src: ['src/**/*.js']
         options:
-          output: 'docs/'
+          output: 'blocks/'
 
   grunt.registerTask 'default', ['js', 'css', 'docs']
   grunt.registerTask 'docs', ['docco:code', 'docco:readme']
