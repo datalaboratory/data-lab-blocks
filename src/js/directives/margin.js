@@ -16,5 +16,5 @@ dataLab.directive('labMargin', function () {
                 d3element.attr('transform', translate)
             })
         }
-    }
+    };
 });

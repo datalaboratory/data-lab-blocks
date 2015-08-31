@@ -3,7 +3,6 @@ dataLab.directive('labFillSvg', function () {
     return {
         // Подключается к `<rect>`.
         restrict: 'A',
-        scope: {},
         link: function ($scope, $element) {
             var element = $element[0];
             var d3element = d3.select(element);
@@ -18,7 +17,7 @@ dataLab.directive('labFillSvg', function () {
                 d3element
                     .attr('width', width)
                     .attr('height', height);
-            })
+            });
         }
-    }
+    };
 });

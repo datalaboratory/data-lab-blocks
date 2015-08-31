@@ -45,5 +45,5 @@ dataLab.directive('labSizeToScales', function () {
                 }
             })
         }
-    }
+    };
 });
