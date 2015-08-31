@@ -175,12 +175,23 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
         }
     };
 });
+// Помещает `$scope` в `datum` элемента. Даёт доступ к `$scope` в `D3`-обработчиках.
+angular.module('dataLab').directive('labBindScope', function (applyTransition) {
+    return {
+        // Подключается к любому элементу.
+        restrict: 'A',
+        link: function ($scope, $element) {
+            var element = $element[0];
+            var d3element = d3.select(element);
+            d3element.datum($scope);
+        }
+    };
+});
 // Директива задаёт прямоугольнику размеры рабочей области.
 dataLab.directive('labFillSvg', function () {
     return {
         // Подключается к `<rect>`.
         restrict: 'A',
-        scope: {},
         link: function ($scope, $element) {
             var element = $element[0];
             var d3element = d3.select(element);
@@ -195,9 +206,9 @@ dataLab.directive('labFillSvg', function () {
                 d3element
                     .attr('width', width)
                     .attr('height', height);
-            })
+            });
         }
-    }
+    };
 });
 // Сдвигает целевой `SVG`-элемент на отступ, указанный в параметрах `render`.
 dataLab.directive('labMargin', function () {
@@ -217,27 +228,32 @@ dataLab.directive('labMargin', function () {
                 d3element.attr('transform', translate)
             })
         }
-    }
+    };
 });
 // Вызов произвольной функции, обрабатывающей событие `render`.
-angular.module('dataLab').directive('labRender', function () {
+angular.module('dataLab').directive('labRender', function (applyTransition) {
     return {
         // Подключается к элементу, который требуется отрисовать.
         restrict: 'A',
         scope: {
+            // Коллбек передаётся через аргумент с названием директивы.
             cb: '=labRender'
         },
         link: function ($scope, $element) {
+            var element = $element[0];
+            var d3element = d3.select(element);
             // Срабатывает на `render`.
-            $scope.$on('render', function ($event, render) {
+            $scope.$on('render', function ($event, render, transition) {
+                // Автоматически применяет `transition`, анимируя все изменения.
+                var target = applyTransition(d3element, transition);
                 // Коллбек должен быть функцией.
                 if (angular.isFunction($scope.cb))
                 // Коллбек вызывается с аргументами `$event` и `render` — событием с мета-информацией и `render`.
                 // Элемент, на котором используется директива передаётся через `this`.
-                    $scope.cb.call($element[0], $event, render)
-            })
+                    $scope.cb.call(target, $event, render);
+            });
         }
-    }
+    };
 });
 // Отправляет на `$rootScope` событие `startRender` после получения одного или нескольких `renderRequired`.
 dataLab.directive('labRenderLoop', function ($rootScope, $timeout) {
@@ -254,6 +270,31 @@ dataLab.directive('labRenderLoop', function ($rootScope, $timeout) {
                     renderRequired = false;
                     $rootScope.$emit('startRender', transition);
                 });
+            });
+        }
+    };
+});
+// Отправляет событие `renderRequired` при изменении размеров окна.
+dataLab.directive('labRenderOnResize', function () {
+    return {
+        // Подключается к любому элементу.
+        restrict: 'A',
+        scope: {
+            // Настройки `transition` передаются через аргумент с названием директивы.
+            transition: '=labRenderOnResize'
+        },
+        link: function ($scope) {
+            var $window = angular.element(window);
+
+            function renderOnResize() {
+                $scope.$emit('renderRequired', $scope.transition);
+            }
+
+            // Функция цепляется на событие `resize` окна.
+            $window.on('resize', renderOnResize);
+            // При уничтожении `$scope` перестаём слушать событие.
+            $scope.$on('$destroy', function () {
+                $window.off('resize', renderOnResize);
             });
         }
     };
@@ -305,7 +346,7 @@ dataLab.directive('labSizeToScales', function () {
                 }
             })
         }
-    }
+    };
 });
 // Заменяет `NaN` на `undefined`.
 dataLab.filter('preventNaN', function () {
