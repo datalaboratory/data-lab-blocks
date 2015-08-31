@@ -80,10 +80,12 @@ $scope.$broadcast('render', render, transition);
 // ---------
 // «Строительные блоки» `angular`-страниц.
 // * [axis](/blocks/axis.html) — рисует ось и линии сетки;
+// * [bindScope](/blocks/bindScope.html) — даёт доступ к `$scope` в `D3`-обработчиках;
 // * [fillSvg](/blocks/fillSvg.html) — задаёт прямоугольнику размер рабочей области;
 // * [margin](/blocks/margin.html) — сдвигает целевой `SVG`-элемент на отступ, указанный в параметрах `render`;
 // * [render](/blocks/render.html) — вызывает переданную функцию при получении события `render`;
 // * [renderLoop](/blocks/renderLoop.html) — обеспечивает рассылку `render`-сообщений;
+// * [renderOnResize](/blocks/renderOnResize.html) — запускает перерисовку всех графиков при изменении размеров экрана;
 // * [sizeToScales](/blocks/sizeToScales.html) — задаёт `range` переданным шкалам на основе размеров элемента с учётом отступов.
 
 // Сервисы
