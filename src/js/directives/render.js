@@ -1,5 +1,5 @@
 // Вызов произвольной функции, обрабатывающей событие `render`.
-angular.module('dataLab').directive('labRender', function (applyTransition) {
+dataLab.directive('labRender', function (applyTransition) {
     return {
         // Подключается к элементу, который требуется отрисовать.
         restrict: 'A',

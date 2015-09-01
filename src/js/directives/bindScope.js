@@ -1,5 +1,5 @@
 // Помещает `$scope` в `datum` элемента. Даёт доступ к `$scope` в `D3`-обработчиках.
-angular.module('dataLab').directive('labBindScope', function (applyTransition) {
+dataLab.directive('labBindScope', function (applyTransition) {
     return {
         // Подключается к любому элементу.
         restrict: 'A',
