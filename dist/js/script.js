@@ -401,6 +401,22 @@ dataLab.value('callMethods', function callMethods(target, config) {
         if (target[key]) target[key](config[key]);
     });
 });
+dataLab.value('fieldAccessor', function fieldAccessor(field) {
+    return function (item) {
+        return item[field];
+    };
+});
+dataLab.value('getDatum', function getDatum(d3element) {
+    var datum;
+    var parent = d3element.node();
+
+    while (!angular.isDefined(datum) && parent) {
+        datum = d3.select(parent).datum();
+        parent = parent.parentNode;
+    }
+
+    return datum;
+});
 // Возвращает последний элемент массива.
 dataLab.value('last', function last(array) {
     return array[array.length - 1];
@@ -451,6 +467,11 @@ dataLab.value('numberDeclension', function (number, titles) {
     return 'no declension';
 });
 
+dataLab.value('objectToArray', function objectToArray(o) {
+    return Object.keys(o).map(function (k) {
+        return o[k];
+    });
+});
 // Сервис, превращающий специфичный объект (например, результат `getBBox()`) в обычный
 // Возвращает объект без прототипа, со всеми свойствами переданного объекта.
 dataLab.value('removePrototype', function removePrototype(object) {
