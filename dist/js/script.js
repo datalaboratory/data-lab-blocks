@@ -291,7 +291,7 @@ dataLab.directive('labSizeToScales', function ($parse) {
     return {
         // Подключается к `<svg>`.
         restrict: 'A',
-        link: function ($scope, $element) {
+        link: function ($scope, $element, $attrs) {
             // Обязательный параметр — объект со шкалами в параметре `data-lab-size-to-scales`.
             var getScales = $parse($attrs.labSizeToScales);
 
