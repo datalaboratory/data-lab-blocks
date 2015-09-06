@@ -1,24 +1,25 @@
 // Рисует ось и линии сетки.
-dataLab.directive('labAxis', function (callMethods, applyTransition) {
+dataLab.directive('labAxis', function ($parse, callMethods, applyTransition) {
     return {
         // Подключается к `<g>`.
         restrict: 'A',
-        scope: {
-            config: '=labAxis'
-        },
-        link: function ($scope, $element) {
+        link: function ($scope, $element, $attrs) {
             var element = $element[0];
             var d3element = d3.select(element);
 
             var $svg = $element.parents('svg');
+
+            // Через параметр `data-lab-axis` передаётся настройка оси.
+            var getConfig = $parse($attrs.labAxis);
 
             var axis = d3.svg.axis();
 
             var prevGrid = false;
 
             $scope.$on('render', function ($event, render, transition) {
-                if (!$scope.config) return;
-                var config = $scope.config;
+                var config = getConfig($scope);
+
+                if (!config) return;
                 if (!config.scale) return;
                 if (!config.orient) return;
 

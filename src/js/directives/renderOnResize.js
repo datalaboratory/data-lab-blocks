@@ -1,17 +1,15 @@
 // Отправляет событие `renderRequired` при изменении размеров окна.
-dataLab.directive('labRenderOnResize', function () {
+dataLab.directive('labRenderOnResize', function ($parse) {
     return {
         // Подключается к любому элементу.
         restrict: 'A',
-        scope: {
-            // Настройки `transition` передаются через аргумент с названием директивы.
-            transition: '=labRenderOnResize'
-        },
-        link: function ($scope) {
+        link: function ($scope, $element, $attrs) {
             var $window = angular.element(window);
+            // Настройки `transition` передаются через аргумент `data-lab-render-on-resize`.
+            var getTransition = $parse($attrs.labRenderOnResize);
 
             function renderOnResize() {
-                $scope.$emit('renderRequired', $scope.transition);
+                $scope.$emit('renderRequired', getTransition($scope));
             }
 
             // Функция цепляется на событие `resize` окна.

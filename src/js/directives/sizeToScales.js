@@ -1,13 +1,12 @@
 // Задаёт `range` переданным шкалам на основе размеров элемента с учётом отступов.
-dataLab.directive('labSizeToScales', function () {
+dataLab.directive('labSizeToScales', function ($parse) {
     return {
         // Подключается к `<svg>`.
         restrict: 'A',
-        scope: {
-            // Обязательный параметр — объект со шкалами.
-            scales: '=labSizeToScales'
-        },
         link: function ($scope, $element) {
+            // Обязательный параметр — объект со шкалами в параметре `data-lab-size-to-scales`.
+            var getScales = $parse($attrs.labSizeToScales);
+
             // Срабатывает на `render`.
             $scope.$on('render', function onRender($event, render) {
                 // В `range` шкал попадают размеры «рабочей области» элемента —
@@ -27,21 +26,23 @@ dataLab.directive('labSizeToScales', function () {
                     scale.range([height, 0]);
                 };
 
+                var scales = getScales($scope);
+
                 // Это ОК, если ключа `x` или `y` нет в объекте — работаем с тем, что есть.
-                if ($scope.scales.x) {
+                if (scales.x) {
                     // Если по ключу нашёлся массив шкал — проставим значения в каждую из них.
-                    if (angular.isArray($scope.scales.x))
-                        $scope.scales.x.forEach(setWidth);
+                    if (angular.isArray(scales.x))
+                        scales.x.forEach(setWidth);
                     // Если шкала одна — проставим в неё.
                     else
-                        setWidth($scope.scales.x);
+                        setWidth(scales.x);
                 }
 
-                if ($scope.scales.y) {
-                    if (angular.isArray($scope.scales.y))
-                        $scope.scales.y.forEach(setHeight);
+                if (scales.y) {
+                    if (angular.isArray(scales.y))
+                        scales.y.forEach(setHeight);
                     else
-                        setHeight($scope.scales.y);
+                        setHeight(scales.y);
                 }
             })
         }

@@ -121,26 +121,27 @@ dataLab.directive('labDropdownFilter', function ($parse) {
     };
 });
 // Рисует ось и линии сетки.
-dataLab.directive('labAxis', function (callMethods, applyTransition) {
+dataLab.directive('labAxis', function ($parse, callMethods, applyTransition) {
     return {
         // Подключается к `<g>`.
         restrict: 'A',
-        scope: {
-            config: '=labAxis'
-        },
-        link: function ($scope, $element) {
+        link: function ($scope, $element, $attrs) {
             var element = $element[0];
             var d3element = d3.select(element);
 
             var $svg = $element.parents('svg');
+
+            // Через параметр `data-lab-axis` передаётся настройка оси.
+            var getConfig = $parse($attrs.labAxis);
 
             var axis = d3.svg.axis();
 
             var prevGrid = false;
 
             $scope.$on('render', function ($event, render, transition) {
-                if (!$scope.config) return;
-                var config = $scope.config;
+                var config = getConfig($scope);
+
+                if (!config) return;
                 if (!config.scale) return;
                 if (!config.orient) return;
 
@@ -172,18 +173,6 @@ dataLab.directive('labAxis', function (callMethods, applyTransition) {
                 }
                 target.call(axis);
             });
-        }
-    };
-});
-// Помещает `$scope` в `datum` элемента. Даёт доступ к `$scope` в `D3`-обработчиках.
-angular.module('dataLab').directive('labBindScope', function (applyTransition) {
-    return {
-        // Подключается к любому элементу.
-        restrict: 'A',
-        link: function ($scope, $element) {
-            var element = $element[0];
-            var d3element = d3.select(element);
-            d3element.datum($scope);
         }
     };
 });
@@ -231,26 +220,26 @@ dataLab.directive('labMargin', function () {
     };
 });
 // Вызов произвольной функции, обрабатывающей событие `render`.
-angular.module('dataLab').directive('labRender', function (applyTransition) {
+dataLab.directive('labRender', function ($parse, applyTransition) {
     return {
         // Подключается к элементу, который требуется отрисовать.
         restrict: 'A',
-        scope: {
-            // Коллбек передаётся через аргумент с названием директивы.
-            cb: '=labRender'
-        },
-        link: function ($scope, $element) {
+        link: function ($scope, $element, $attrs) {
             var element = $element[0];
             var d3element = d3.select(element);
+
+            // Коллбек передаётся через аргумент `data-lab-render`.
+            var getCallback = $parse($attrs.labRender);
             // Срабатывает на `render`.
             $scope.$on('render', function ($event, render, transition) {
                 // Автоматически применяет `transition`, анимируя все изменения.
                 var target = applyTransition(d3element, transition);
                 // Коллбек должен быть функцией.
-                if (angular.isFunction($scope.cb))
+                var cb = getCallback($scope);
+                if (angular.isFunction(cb))
                 // Коллбек вызывается с аргументами `$event` и `render` — событием с мета-информацией и `render`.
                 // Элемент, на котором используется директива передаётся через `this`.
-                    $scope.cb.call(target, $event, render);
+                    cb.call(target, $event, render);
             });
         }
     };
@@ -275,19 +264,17 @@ dataLab.directive('labRenderLoop', function ($rootScope, $timeout) {
     };
 });
 // Отправляет событие `renderRequired` при изменении размеров окна.
-dataLab.directive('labRenderOnResize', function () {
+dataLab.directive('labRenderOnResize', function ($parse) {
     return {
         // Подключается к любому элементу.
         restrict: 'A',
-        scope: {
-            // Настройки `transition` передаются через аргумент с названием директивы.
-            transition: '=labRenderOnResize'
-        },
-        link: function ($scope) {
+        link: function ($scope, $element, $attrs) {
             var $window = angular.element(window);
+            // Настройки `transition` передаются через аргумент `data-lab-render-on-resize`.
+            var getTransition = $parse($attrs.labRenderOnResize);
 
             function renderOnResize() {
-                $scope.$emit('renderRequired', $scope.transition);
+                $scope.$emit('renderRequired', getTransition($scope));
             }
 
             // Функция цепляется на событие `resize` окна.
@@ -300,15 +287,14 @@ dataLab.directive('labRenderOnResize', function () {
     };
 });
 // Задаёт `range` переданным шкалам на основе размеров элемента с учётом отступов.
-dataLab.directive('labSizeToScales', function () {
+dataLab.directive('labSizeToScales', function ($parse) {
     return {
         // Подключается к `<svg>`.
         restrict: 'A',
-        scope: {
-            // Обязательный параметр — объект со шкалами.
-            scales: '=labSizeToScales'
-        },
         link: function ($scope, $element) {
+            // Обязательный параметр — объект со шкалами в параметре `data-lab-size-to-scales`.
+            var getScales = $parse($attrs.labSizeToScales);
+
             // Срабатывает на `render`.
             $scope.$on('render', function onRender($event, render) {
                 // В `range` шкал попадают размеры «рабочей области» элемента —
@@ -328,21 +314,23 @@ dataLab.directive('labSizeToScales', function () {
                     scale.range([height, 0]);
                 };
 
+                var scales = getScales($scope);
+
                 // Это ОК, если ключа `x` или `y` нет в объекте — работаем с тем, что есть.
-                if ($scope.scales.x) {
+                if (scales.x) {
                     // Если по ключу нашёлся массив шкал — проставим значения в каждую из них.
-                    if (angular.isArray($scope.scales.x))
-                        $scope.scales.x.forEach(setWidth);
+                    if (angular.isArray(scales.x))
+                        scales.x.forEach(setWidth);
                     // Если шкала одна — проставим в неё.
                     else
-                        setWidth($scope.scales.x);
+                        setWidth(scales.x);
                 }
 
-                if ($scope.scales.y) {
-                    if (angular.isArray($scope.scales.y))
-                        $scope.scales.y.forEach(setHeight);
+                if (scales.y) {
+                    if (angular.isArray(scales.y))
+                        scales.y.forEach(setHeight);
                     else
-                        setHeight($scope.scales.y);
+                        setHeight(scales.y);
                 }
             })
         }
@@ -405,17 +393,6 @@ dataLab.value('fieldAccessor', function fieldAccessor(field) {
     return function (item) {
         return item[field];
     };
-});
-dataLab.value('getDatum', function getDatum(d3element) {
-    var datum;
-    var parent = d3element.node();
-
-    while (!angular.isDefined(datum) && parent) {
-        datum = d3.select(parent).datum();
-        parent = parent.parentNode;
-    }
-
-    return datum;
 });
 // Возвращает последний элемент массива.
 dataLab.value('last', function last(array) {
